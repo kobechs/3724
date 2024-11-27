@@ -1,0 +1,109 @@
+body {
+	text-align: center;	
+}
+h1 {
+	color: #979797;
+}
+#question {
+	width: 100%;
+	margin: 40px 0;
+	font-size: 60px;
+}
+#answerForm {
+	font-size: 20px;
+}
+#answer {
+	width: 60%;
+}
+body {
+	font-family: 'Arial', sans-serif;
+	background: linear-gradient(120deg, #a0c4ff, #f0f4f8); /* 柔らかい青と白のグラデーション */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+	color: #333; /* ダークグレー */
+}
+
+#container {
+	text-align: center;
+	background: #ffffff; /* 背景を白に */
+	padding: 40px;
+	border-radius: 15px;
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+	width: 80%;
+	max-width: 700px;
+	transition: all 0.3s ease-in-out;
+}
+
+#container:hover {
+	transform: translateY(-10px);
+	box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
+}
+
+#startScreen h1 {
+	color: #333;
+	font-size: 2.5em;
+}
+
+#quizContainer {
+	display: none;
+}
+
+#question {
+	font-size: 1.8em;
+	margin-bottom: 20px;
+}
+
+#answerForm input {
+	padding: 12px;
+	font-size: 1.2em;
+	width: 75%;
+	margin-bottom: 20px;
+	border-radius: 5px;
+	border: 2px solid #ccc;
+	color: #333; /* ダークグレー */
+}
+
+#answerForm button {
+	padding: 12px 20px;
+	font-size: 1.2em;
+	cursor: pointer;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	width: 80%;
+	transition: background-color 0.3s;
+}
+
+#answerForm button:hover {
+	background-color: #45a049;
+}
+
+#resultMessage {
+	font-size: 1.5em;
+	margin-top: 20px;
+	color: #333;
+	font-weight: bold;
+}
+
+button {
+	background-color: #007BFF;
+	color: white;
+	padding: 15px 30px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 1.2em;
+	transition: background-color 0.3s;
+}
+
+button:hover {
+	background-color: #0056b3;
+}
+
+#retryButton {
+	display: none;
+}

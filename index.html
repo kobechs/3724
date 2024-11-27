@@ -1,0 +1,491 @@
+<!DOCTYPE HTML> 
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #quizContainer {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #choices div {
+            margin-bottom: 10px;
+        }
+
+        #choices button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+
+        #choices button:hover {
+            background-color: #45a049; 
+        }
+
+        .correct {
+            background-color: #3e8e41;
+        }
+
+        .incorrect {
+            background-color: #f44336;
+        }
+
+        #resultMessage {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #retryButton {
+            display: none;
+        }
+
+        #okButton {
+            background-color: #008CBA; 
+            color: white;
+        }
+
+        #okButton:hover {
+            background-color: #007B9A;
+        }
+    </style>
+    <script>
+        let no = 0;
+        let score = 0;
+        let rewardPoints = 0;
+
+        let questionList = [
+            { 
+                question: "HTMLで見出しを作るためのタグは？", 
+                choices: ["h1", "header", "div", "section"], 
+                answer: "h1",
+                explanation: "HTMLで見出しを作るタグは<h1>です。h1タグはページの最も重要な見出しとして使用されます。"
+            },
+            { 
+                question: "CSSで文字色を変更するプロパティは？", 
+                choices: ["color", "text-color", "font-color", "background-color"], 
+                answer: "color",
+                explanation: "文字色を変更するためにはCSSのcolorプロパティを使用します。text-colorやfont-colorは存在しません。"
+            },
+            { 
+                question: "HTMLでリンクを作るためのタグは？", 
+                choices: ["a", "link", "href", "button"], 
+                answer: "a",
+                explanation: "リンクを作成するには<a>タグを使用します。href属性を使用してリンク先を指定します。"
+            },
+            { 
+                question: "CSSで背景色を変更するプロパティは？", 
+                choices: ["background-color", "bg-color", "color", "background"], 
+                answer: "background-color",
+                explanation: "CSSで背景色を変更するにはbackground-colorプロパティを使用します。"
+            },
+            { 
+                question: "JavaScriptでコンソールにメッセージを表示するにはどの関数を使用しますか？", 
+                choices: ["console.log()", "alert()", "print()", "log.console()"], 
+                answer: "console.log()",
+                explanation: "コンソールにメッセージを表示するためにはconsole.log()を使用します。alert()はポップアップでメッセージを表示します。"
+            },
+            { 
+                question: "HTMLでフォームを作るタグは？", 
+                choices: ["form", "input", "button", "select"], 
+                answer: "form",
+                explanation: "フォームを作成するためには<form>タグを使用します。"
+            },
+            { 
+                question: "CSSでボーダーを設定するプロパティは？", 
+                choices: ["border", "outline", "box-border", "edge"], 
+                answer: "border",
+                explanation: "ボーダーを設定するためにはborderプロパティを使用します。"
+            },
+            { 
+                question: "JavaScriptで変数を宣言するキーワードは？", 
+                choices: ["var", "let", "const", "全て"], 
+                answer: "全て",
+                explanation: "JavaScriptでは変数を宣言するために、var、let、またはconstを使用できます。"
+            },
+            { 
+                question: "HTMLでリンクを新しいタブで開くための属性は？", 
+                choices: ["target='_blank'", "href='_new'", "new-tab", "open-tab"], 
+                answer: "target='_blank'",
+                explanation: "リンクを新しいタブで開くためには、target属性に'_blank'を指定します。"
+            },
+            { 
+                question: "CSSで文字を太くするプロパティは？", 
+                choices: ["font-weight", "font-size", "bold", "text-weight"], 
+                answer: "font-weight",
+                explanation: "文字を太くするためにはfont-weightプロパティを使用します。"
+            },
+            { 
+                question: "HTMLで段落を作るタグは？", 
+                choices: ["p", "paragraph", "div", "section"], 
+                answer: "p",
+                explanation: "<p>タグは段落を作成するために使用します。"
+            },
+            { 
+                question: "CSSで要素の位置を指定するプロパティは？", 
+                choices: ["position", "location", "place", "align"], 
+                answer: "position",
+                explanation: "要素の位置を指定するためにはpositionプロパティを使用します。"
+            },
+            { 
+                question: "JavaScriptで文字列の長さを取得するにはどのメソッドを使用しますか？", 
+                choices: ["length()", "size()", "count()", "getLength()"], 
+                answer: "length()",
+                explanation: "文字列の長さを取得するにはlength()メソッドを使用します。"
+            },
+            { 
+                question: "HTMLで入力ボックスを作るタグは？", 
+                choices: ["input", "textbox", "form", "box"], 
+                answer: "input",
+                explanation: "<input>タグは入力ボックスを作成するために使用します。"
+            },
+            { 
+                question: "CSSでフォントのサイズを変更するプロパティは？", 
+                choices: ["font-size", "text-size", "font-style", "size"], 
+                answer: "font-size",
+                explanation: "フォントのサイズを変更するためにはfont-sizeプロパティを使用します。"
+            },
+            { 
+                question: "JavaScriptで配列の要素数を取得するにはどのプロパティを使用しますか？", 
+                choices: ["length", "size", "count", "length()"], 
+                answer: "length",
+                explanation: "配列の要素数を取得するためにはlengthプロパティを使用します。"
+            },
+            { 
+                question: "HTMLで画像を表示するためのタグは？", 
+                choices: ["img", "image", "src", "pic"], 
+                answer: "img",
+                explanation: "<img>タグは画像を表示するために使用します。src属性で画像のパスを指定します。"
+            },
+            { 
+                question: "CSSでテキストの行間を設定するプロパティは？", 
+                choices: ["line-height", "spacing", "text-spacing", "line-spacing"], 
+                answer: "line-height",
+                explanation: "テキストの行間を設定するためにはline-heightプロパティを使用します。"
+            },
+            { 
+                question: "JavaScriptで2つの数値を加算する演算子は？", 
+                choices: ["+", "-", "*", "/"], 
+                answer: "+",
+                explanation: "数値を加算する演算子は+です。"
+            },
+            { 
+                question: "HTMLでリストを作るためのタグは？", 
+                choices: ["ul", "ol", "li", "list"], 
+                answer: "ul",
+                explanation: "<ul>タグは順不同リストを作成するために使用します。"
+            },
+            { 
+                question: "CSSで文字の太さを設定するプロパティは？", 
+                choices: ["font-weight", "text-weight", "bold", "font-style"], 
+                answer: "font-weight",
+                explanation: "文字の太さを設定するためにはfont-weightプロパティを使用します。"
+            },
+            { 
+                question: "HTMLでボタンを作るタグは？", 
+                choices: ["button", "input", "form", "div"], 
+                answer: "button",
+                explanation: "<button>タグはボタンを作成するために使用されます。"
+            },
+            { 
+                question: "CSSで要素の余白を設定するプロパティは？", 
+                choices: ["margin", "padding", "spacing", "border"], 
+                answer: "margin",
+                explanation: "要素の周囲の余白を設定するにはmarginプロパティを使用します。"
+             },
+    { 
+                question: "JavaScriptで関数を定義するキーワードは？", 
+                choices: ["function", "def", "method", "func"], 
+                answer: "function",
+                explanation: "JavaScriptではfunctionキーワードを使って関数を定義します。"
+    },
+    { 
+                question: "HTMLでテーブルを作るタグは？", 
+                choices: ["table", "tr", "td", "grid"], 
+                answer: "table",
+                explanation: "テーブルを作成するには<table>タグを使用します。"
+    },
+    { 
+                question: "CSSで要素を中央揃えにするには？", 
+                choices: ["text-align: center;", "align: center;", "center: true;", "justify: center;"], 
+                answer: "text-align: center;",
+                explanation: "テキストを中央揃えにするにはtext-align: center;を使用します。"
+    },
+     { 
+                question: "JavaScriptで条件分岐を作る構文は？", 
+                choices: ["if", "switch", "case", "すべて"], 
+                answer: "すべて",
+                explanation: "JavaScriptではif文、switch文などを使って条件分岐を作成します。"
+     },
+    { 
+                question: "HTMLでタイトルを指定するタグは？", 
+                choices: ["title", "head", "header", "meta"], 
+                answer: "title",
+                explanation: "<title>タグはWebページのタイトルを指定します。"
+    },
+    { 
+        question: "HTMLで見出しを作るためのタグは？", 
+        choices: ["h1", "header", "div", "section"], 
+        answer: "h1",
+        explanation: "HTMLで見出しを作るタグは<h1>です。h1タグはページの最も重要な見出しとして使用されます。"
+    },
+    { 
+        question: "CSSで文字色を変更するプロパティは？", 
+        choices: ["color", "text-color", "font-color", "background-color"], 
+        answer: "color",
+        explanation: "文字色を変更するためにはCSSのcolorプロパティを使用します。text-colorやfont-colorは存在しません。"
+    },
+    { 
+        question: "HTMLでリンクを作るためのタグは？", 
+        choices: ["a", "link", "href", "button"], 
+        answer: "a",
+        explanation: "リンクを作成するには<a>タグを使用します。href属性を使用してリンク先を指定します。"
+    },
+    { 
+        question: "CSSで背景色を変更するプロパティは？", 
+        choices: ["background-color", "bg-color", "color", "background"], 
+        answer: "background-color",
+        explanation: "CSSで背景色を変更するにはbackground-colorプロパティを使用します。"
+    },
+    { 
+        question: "JavaScriptでコンソールにメッセージを表示するにはどの関数を使用しますか？", 
+        choices: ["console.log()", "alert()", "print()", "log.console()"], 
+        answer: "console.log()",
+        explanation: "コンソールにメッセージを表示するためにはconsole.log()を使用します。alert()はポップアップでメッセージを表示します。"
+    },
+    { 
+        question: "HTMLでフォームを作るタグは？", 
+        choices: ["form", "input", "button", "select"], 
+        answer: "form",
+        explanation: "フォームを作成するためには<form>タグを使用します。"
+    },
+    { 
+        question: "CSSでボーダーを設定するプロパティは？", 
+        choices: ["border", "outline", "box-border", "edge"], 
+        answer: "border",
+        explanation: "ボーダーを設定するためにはborderプロパティを使用します。"
+    },
+    { 
+        question: "JavaScriptで変数を宣言するキーワードは？", 
+        choices: ["var", "let", "const", "全て"], 
+        answer: "全て",
+        explanation: "JavaScriptでは変数を宣言するために、var、let、またはconstを使用できます。"
+    },
+    { 
+        question: "HTMLでリンクを新しいタブで開くための属性は？", 
+        choices: ["target='_blank'", "href='_new'", "new-tab", "open-tab"], 
+        answer: "target='_blank'",
+        explanation: "リンクを新しいタブで開くためには、target属性に'_blank'を指定します。"
+    },
+    { 
+        question: "CSSで文字を太くするプロパティは？", 
+        choices: ["font-weight", "font-size", "bold", "text-weight"], 
+        answer: "font-weight",
+        explanation: "文字を太くするためにはfont-weightプロパティを使用します。"
+    },
+    { 
+        question: "HTMLで段落を作るタグは？", 
+        choices: ["p", "paragraph", "div", "section"], 
+        answer: "p",
+        explanation: "<p>タグは段落を作成するために使用します。"
+    },
+    { 
+        question: "CSSで要素の位置を指定するプロパティは？", 
+        choices: ["position", "location", "place", "align"], 
+        answer: "position",
+        explanation: "要素の位置を指定するためにはpositionプロパティを使用します。"
+    },
+    { 
+        question: "JavaScriptで文字列の長さを取得するにはどのプロパティを使用しますか？", 
+        choices: ["length", "size", "count", "getLength"], 
+        answer: "length",
+        explanation: "文字列の長さを取得するにはlengthプロパティを使用します。"
+    },
+    { 
+        question: "HTMLで入力ボックスを作るタグは？", 
+        choices: ["input", "textbox", "form", "box"], 
+        answer: "input",
+        explanation: "<input>タグは入力ボックスを作成するために使用します。"
+    },
+    { 
+        question: "CSSでフォントのサイズを変更するプロパティは？", 
+        choices: ["font-size", "text-size", "font-style", "size"], 
+        answer: "font-size",
+        explanation: "フォントのサイズを変更するためにはfont-sizeプロパティを使用します。"
+    },
+    { 
+        question: "JavaScriptで配列の要素数を取得するにはどのプロパティを使用しますか？", 
+        choices: ["length", "size", "count", "length()"], 
+        answer: "length",
+        explanation: "配列の要素数を取得するためにはlengthプロパティを使用します。"
+    },
+    { 
+        question: "HTMLで画像を表示するためのタグは？", 
+        choices: ["img", "image", "src", "pic"], 
+        answer: "img",
+        explanation: "<img>タグは画像を表示するために使用します。src属性で画像のパスを指定します。"
+    },
+    { 
+        question: "CSSでテキストの行間を設定するプロパティは？", 
+        choices: ["line-height", "spacing", "text-spacing", "line-spacing"], 
+        answer: "line-height",
+        explanation: "テキストの行間を設定するためにはline-heightプロパティを使用します。"
+    },
+    { 
+        question: "JavaScriptで2つの数値を加算する演算子は？", 
+        choices: ["+", "-", "*", "/"], 
+        answer: "+",
+        explanation: "数値を加算する演算子は+です。"
+    },
+    { 
+        question: "HTMLでリストを作るためのタグは？", 
+        choices: ["ul", "ol", "li", "list"], 
+        answer: "ul",
+        explanation: "<ul>タグは順不同リストを作成するために使用します。"
+    },
+    { 
+        question: "JavaScriptでクリックイベントを設定する正しいコードは？", 
+        choices: [
+            "button.addEventListener('click', function() { console.log('Clicked'); });",
+            "button.click(function() { console.log('Clicked'); });",
+            "onClick(button, function() { console.log('Clicked'); });",
+            "button.on('click', function() { console.log('Clicked'); });"
+        ], 
+        answer: "button.addEventListener('click', function() { console.log('Clicked'); });",
+        explanation: "addEventListenerを使用してイベントを設定します。"
+    },
+    { 
+        question: "Webページの読み込み速度を向上させる方法は？", 
+        choices: [
+            "画像を圧縮する",
+            "CSSやJavaScriptを圧縮する",
+            "キャッシュを利用する",
+            "全て"
+        ], 
+        answer: "全て",
+        explanation: "これら全ての方法はページの読み込み速度を改善するのに有効です。"
+    },
+        ];
+
+        function startQuiz() {
+            document.getElementById("startScreen").style.display = "none";
+            document.getElementById("quizContainer").style.display = "block";
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (no < questionList.length) {
+                document.getElementById("question").innerText = questionList[no].question;
+                document.getElementById("score").innerText = "スコア: " + score + "/" + questionList.length;
+                displayChoices();
+            } else {
+                document.getElementById("question").innerText = "あなたのスコア: " + score + "/" + questionList.length;
+                document.getElementById("answerForm").style.display = "none";
+                displayResultMessage();
+                document.getElementById("retryButton").style.display = "block";
+            }
+        }
+
+        function displayChoices() {
+            let choicesDiv = document.getElementById("choices");
+            choicesDiv.innerHTML = '';
+            questionList[no].choices.forEach(function(choice, index) {
+                let choiceDiv = document.createElement("div");
+                let button = document.createElement("button");
+                button.textContent = choice;
+                button.onclick = function() {
+                    judge(choice);
+                };
+                choiceDiv.appendChild(button);
+                choicesDiv.appendChild(choiceDiv);
+            });
+        }
+
+        function judge(selectedChoice) {
+            let correct = selectedChoice === questionList[no].answer;
+            let answer = questionList[no].answer;
+            let explanation = questionList[no].explanation;
+
+            if (correct) {
+                alert("正解！" + explanation);
+                score++;
+            } else {
+                alert("不正解... 正しい答えは: " + answer + ". " + explanation);
+            }
+
+            no++;
+            showQuestion();
+        }
+
+        function displayResultMessage() {
+            let message = "";
+            if (score === questionList.length) {
+                message = "全問正解！最高じゃん！オールパーフェクトおめでとう！";
+            } else if (score >= questionList.length * 0.7) {
+                message = "素晴らしい！あと少しで完璧！次回は全問正解を目指せ！";
+            } else if (score >= questionList.length * 0.4) {
+                message = "惜しい！あと少しで良い結果が出せそうです。再挑戦してスキルアップを！";
+            } else {
+                message = "もう少し頑張りましょう！次の挑戦を待ってるぜ！";
+            }
+            rewardPoints += score;
+            message += "\nあなたのポイント: " + rewardPoints;
+            document.getElementById("resultMessage").innerText = message;
+        }
+
+        function retryQuiz() {
+            no = 0;
+            score = 0;
+            document.getElementById("answerForm").style.display = "block";
+            document.getElementById("retryButton").style.display = "none";
+            showQuestion();
+            document.getElementById("resultMessage").innerText = "";
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                judge();
+            }
+        });
+    </script>
+    <title>HTML, CSS, JavaScript クイズ</title>
+</head>
+<body>
+    <div id="container">
+        <div id="startScreen">
+            <h1>ホームページ制作工房</h1>
+            <p>HTML、CSS、JavaScriptに関する基本的な知識をテストしてみよう！</p>
+            <button onclick="startQuiz()">スタート</button>
+        </div>
+        <div id="quizContainer">
+            <main>
+                <div id="score">スコア: 0/60</div>
+                <div id="question"></div>
+                <div id="answerForm">
+                    <div id="choices"></div>
+                </div>
+                <div id="result">
+                    <p id="resultMessage"></p>
+                </div>
+                <button id="retryButton" onclick="retryQuiz()">もう一度やる</button>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
